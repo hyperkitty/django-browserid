@@ -27,6 +27,7 @@ class BrowserIDInfoTests(TestCase):
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',
             'csrfUrl': '/browserid/csrf/',
+            'csrfCookieName': 'csrf_token',
             'requestArgs': {'foo': 'bar', 'baz': 1},
         }
         self.render_to_string.assertCalledWith('browserid/info.html', {'info': expected_info})
@@ -40,6 +41,7 @@ class BrowserIDInfoTests(TestCase):
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',
             'csrfUrl': '/browserid/csrf/',
+            'csrfCookieName': 'csrf_token',
             'requestArgs': {'siteName': 'asdf'},
         }
         self.render_to_string.assertCalledWith('browserid/info.html', {'info': expected_info})

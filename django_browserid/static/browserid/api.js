@@ -93,11 +93,40 @@
         },
 
         /**
-         * Fetch a CSRF token from the backend.
-         * @return {jqXHR} jQuery XmlHttpResponse that returns the token.
+         * Get a cookie value.
+         * @param {string} the name of the cookie
+         * @return {string} the value of the cookie
+         */
+        getCookie: function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        },
+
+        /**
+         * Fetch a CSRF token from the cookies or the backend if not found.
+         * @return {jQuery.Deferred} Deferred that resolves once the token is obtained.
          */
         getCsrfToken: function getCsrfToken() {
-            return $.get(this.getInfo().csrfUrl);
+            var token, defer;
+            token = this.getCookie(this.getInfo().csrfCookieName);
+            if (token) {
+                defer = $.Deferred();
+                defer.resolve(token);
+                return defer;
+            } else {
+                return $.get(this.getInfo().csrfUrl);
+            }
         },
 
         // Deferred for post-watch-callback actions.
