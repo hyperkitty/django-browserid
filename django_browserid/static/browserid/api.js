@@ -34,13 +34,12 @@
          *                           been logged out.
          */
         logout: function logout(next) {
-            var info = this.getInfo();
-            return this.getCsrfToken().then(function(csrfToken) {
-                return $.ajax(info.logoutUrl, {
-                    type: 'POST',
-                    data: {next: next},
-                    headers: {'X-CSRFToken': csrfToken},
-                });
+            var info = this.getInfo(),
+                csrfToken = this.getCsrfToken();
+            return $.ajax(info.logoutUrl, {
+                type: 'POST',
+                data: {next: next},
+                headers: {'X-CSRFToken': csrfToken},
             });
         },
 
@@ -67,13 +66,12 @@
          *                           response once login is complete.
          */
         verifyAssertion: function verifyAssertion(assertion, next) {
-            var info = this.getInfo();
-            return this.getCsrfToken().then(function(csrfToken) {
-                return $.ajax(info.loginUrl, {
-                    type: 'POST',
-                    data: {assertion: assertion, next: next},
-                    headers: {'X-CSRFToken': csrfToken},
-                });
+            var info = this.getInfo(),
+                csrfToken = this.getCsrfToken();
+            return $.ajax(info.loginUrl, {
+                type: 'POST',
+                data: {assertion: assertion, next: next},
+                headers: {'X-CSRFToken': csrfToken},
             });
         },
 
@@ -93,11 +91,32 @@
         },
 
         /**
-         * Fetch a CSRF token from the backend.
-         * @return {jqXHR} jQuery XmlHttpResponse that returns the token.
+         * Get a cookie value.
+         * @param {string} the name of the cookie
+         * @return {string} the value of the cookie
+         */
+        getCookie: function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        },
+
+        /**
+         * Get the CSRF token from the cookies.
+         * @return {string} the CSRF token value.
          */
         getCsrfToken: function getCsrfToken() {
-            return $.get(this.getInfo().csrfUrl);
+            return this.getCookie(this.getInfo().csrfCookieName);
         },
 
         // Deferred for post-watch-callback actions.

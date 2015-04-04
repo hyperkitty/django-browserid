@@ -47,7 +47,7 @@ def browserid_info():
     info = json.dumps({
         'loginUrl': reverse('browserid.login'),
         'logoutUrl': reverse('browserid.logout'),
-        'csrfUrl': reverse('browserid.csrf'),
+        'csrfCookieName': settings.CSRF_COOKIE_NAME,
         'requestArgs': request_args,
     }, cls=LazyEncoder)
 

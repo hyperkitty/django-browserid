@@ -25,5 +25,4 @@ except ImproperlyConfigured as e:
 urlpatterns = patterns('',
     url(r'^browserid/login/$', Verify.as_view(), name='browserid.login'),
     url(r'^browserid/logout/$', views.Logout.as_view(), name='browserid.logout'),
-    url(r'^browserid/csrf/$', views.CsrfToken.as_view(), name='browserid.csrf'),
 )

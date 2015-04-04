@@ -104,24 +104,6 @@ class Verify(JSONView):
         return super(Verify, self).dispatch(request, *args, **kwargs)
 
 
-class CsrfToken(JSONView):
-    """Fetch a CSRF token for the frontend JavaScript."""
-    @never_cache
-    def get(self, request):
-        # Different CSRF libraries (namely session_csrf) store the CSRF
-        # token in different places. The only way to retrieve the token
-        # that works with both the built-in CSRF and session_csrf is to
-        # pull it from the template context processors via
-        # RequestContext.
-        context = RequestContext(request)
-
-        # csrf_token might be a lazy value that triggers side-effects,
-        # so we need to force it to a string.
-        csrf_token = six.text_type(context.get('csrf_token', ''))
-
-        return HttpResponse(csrf_token)
-
-
 class Logout(JSONView):
     @property
     def redirect_url(self):

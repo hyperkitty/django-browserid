@@ -208,39 +208,3 @@ class LogoutTests(TestCase):
                 response = logout(request)
 
         self.assert_json_equals(response.content, {'redirect': '/test/bar'})
-
-
-class CsrfTokenTests(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.view = views.CsrfToken()
-
-    def test_lazy_token_called(self):
-        """
-        If the csrf_token variable in the RequestContext is a lazy
-        callable, make sure it is called during the view.
-        """
-        global _lazy_csrf_token_called
-        _lazy_csrf_token_called = False
-
-        # I'd love to use a Mock here instead, but lazy doesn't behave
-        # well with Mocks for some reason.
-        def _lazy_csrf_token():
-            global _lazy_csrf_token_called
-            _lazy_csrf_token_called = True
-            return 'asdf'
-        csrf_token = lazy(_lazy_csrf_token, six.text_type)()
-
-        request = self.factory.get('/browserid/csrf/')
-        with patch('django_browserid.views.RequestContext') as RequestContext:
-            RequestContext.return_value = {'csrf_token': csrf_token}
-            response = self.view.get(request)
-
-        eq_(response.status_code, 200)
-        eq_(response.content, b'asdf')
-        ok_(_lazy_csrf_token_called)
-
-    def test_never_cache(self):
-        request = self.factory.get('/browserid/csrf/')
-        response = self.view.get(request)
-        eq_(response['Cache-Control'], 'max-age=0')
